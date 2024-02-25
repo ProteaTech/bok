@@ -1,4 +1,4 @@
-package webserver
+package bok
 
 import (
 	"net/http"
