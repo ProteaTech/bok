@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	router "github.com/proteatech/bok"
+	"github.com/ProteaTech/bok"
 )
 
 // LogRequest is a middleware that logs the request

@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/proteatech/bok"
+	"github.com/ProteaTech/bok"
 	"net/http"
 )
 

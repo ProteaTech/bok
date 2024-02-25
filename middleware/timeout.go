@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/proteatech/bok"
+	"github.com/ProteaTech/bok"
 )
 
 // Timeout is a middleware that sets a timeout for the request

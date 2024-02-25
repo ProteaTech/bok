@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/proteatech/bok"
+	"github.com/ProteaTech/bok"
 )
 
 // RecoverPanic is a middleware that recovers from panics
