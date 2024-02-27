@@ -33,32 +33,26 @@ func NewRouter() *appRouter {
 }
 
 func (r *appRouter) GET(path string, handler http.HandlerFunc) {
-	handler = runMiddleware(r, handler)
 	r.Handle("GET "+path, handler)
 }
 
 func (r *appRouter) POST(path string, handler http.HandlerFunc) {
-	handler = runMiddleware(r, handler)
 	r.Handle("POST "+path, handler)
 }
 
 func (r *appRouter) PUT(path string, handler http.HandlerFunc) {
-	handler = runMiddleware(r, handler)
 	r.Handle("PUT "+path, handler)
 }
 
 func (r *appRouter) DELETE(path string, handler http.HandlerFunc) {
-	handler = runMiddleware(r, handler)
 	r.Handle("DELETE "+path, handler)
 }
 
 func (r *appRouter) PATCH(path string, handler http.HandlerFunc) {
-	handler = runMiddleware(r, handler)
 	r.Handle("PATCH "+path, handler)
 }
 
 func (r *appRouter) OPTIONS(path string, handler http.HandlerFunc) {
-	handler = runMiddleware(r, handler)
 	r.Handle("OPTIONS "+path, handler)
 }
 
