@@ -8,14 +8,16 @@ import (
 )
 
 // LogRequest is a middleware that logs the request
-func Logger() bok.Middleware {
+func Logger(logger *slog.Logger) bok.Middleware {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			slog.Info("🚸 Handling request from logging middleware",
+			logger.InfoContext(
+				r.Context(),
+				"Request",
 				"method", r.Method,
-				"path", r.URL.Path,
+				"path", r.URL.RequestURI(),
 				"remote", r.RemoteAddr,
-				"user-agent", r.UserAgent(),
+				"user_agent", r.UserAgent(),
 			)
 			next(w, r)
 		}
