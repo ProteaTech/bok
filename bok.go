@@ -80,8 +80,10 @@ func (r *appRouter) WithMiddleware(middleware ...Middleware) Router {
 	return router
 }
 
+// middleware needs to be ran in reverse order so that the first middleware
+// passed is the first to be executed.
 func runMiddleware(r *appRouter, handler http.HandlerFunc) http.HandlerFunc {
-	for i := 0; i < len(r.middleware); i++ {
+	for i := len(r.middleware) - 1; i >= 0; i-- {
 		handler = r.middleware[i](handler)
 	}
 	return handler
