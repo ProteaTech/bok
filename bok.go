@@ -40,6 +40,7 @@ type Router interface {
 	HEAD(path string, handler http.HandlerFunc)
 	WithMiddleware(middleware ...Middleware) Router
 	SetPrefix(prefix string)
+	SetLogger(logger *slog.Logger)
 }
 
 // appRouter is our implementation.
