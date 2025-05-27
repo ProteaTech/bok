@@ -9,6 +9,7 @@ type Middleware func(http.HandlerFunc) http.HandlerFunc
 type appRouter struct {
 	*http.ServeMux
 	middleware []Middleware
+	prefix     string
 }
 
 type Router interface {
@@ -33,40 +34,49 @@ func NewRouter() *appRouter {
 }
 
 func (r *appRouter) GET(path string, handler http.HandlerFunc) {
+	path = getModifiedPath(r.prefix, path)
 	r.Handle("GET "+path, handler)
 }
 
 func (r *appRouter) POST(path string, handler http.HandlerFunc) {
+	path = getModifiedPath(r.prefix, path)
 	r.Handle("POST "+path, handler)
 }
 
 func (r *appRouter) PUT(path string, handler http.HandlerFunc) {
+	path = getModifiedPath(r.prefix, path)
 	r.Handle("PUT "+path, handler)
 }
 
 func (r *appRouter) DELETE(path string, handler http.HandlerFunc) {
+	path = getModifiedPath(r.prefix, path)
 	r.Handle("DELETE "+path, handler)
 }
 
 func (r *appRouter) PATCH(path string, handler http.HandlerFunc) {
+	path = getModifiedPath(r.prefix, path)
 	r.Handle("PATCH "+path, handler)
 }
 
 func (r *appRouter) OPTIONS(path string, handler http.HandlerFunc) {
+	path = getModifiedPath(r.prefix, path)
 	r.Handle("OPTIONS "+path, handler)
 }
 
 func (r *appRouter) HEAD(path string, handler http.HandlerFunc) {
+	path = getModifiedPath(r.prefix, path)
 	handler = runMiddleware(r, handler)
 	r.Handle("HEAD "+path, handler)
 }
 
 func (r *appRouter) Handle(path string, handler http.Handler) {
+	path = getModifiedPath(r.prefix, path)
 	handler = runMiddleware(r, handler.ServeHTTP)
 	r.ServeMux.Handle(path, handler)
 }
 
 func (r *appRouter) HandleFunc(path string, handler http.HandlerFunc) {
+	path = getModifiedPath(r.prefix, path)
 	handler = runMiddleware(r, handler)
 	r.ServeMux.HandleFunc(path, handler)
 }
@@ -76,8 +86,20 @@ func (r *appRouter) HandleFunc(path string, handler http.HandlerFunc) {
 func (r *appRouter) WithMiddleware(middleware ...Middleware) Router {
 	var router = NewRouter()
 	router.ServeMux = r.ServeMux
+	router.prefix = r.prefix
 	router.middleware = append(r.middleware, middleware...)
 	return router
+}
+
+// SetPrefix sets a prefix for all routes in the router.
+// For example, if the prefix is "/api", then a route
+// registered with the path "/users" will be accessible at "/api/users".
+func (r *appRouter) SetPrefix(prefix string) {
+	r.prefix = prefix
+	if len(prefix) > 0 && prefix[len(prefix)-1] != '/' {
+		prefix += "/"
+	}
+	r.ServeMux.Handle(prefix, http.StripPrefix(prefix, r.ServeMux))
 }
 
 // middleware needs to be ran in reverse order so that the first middleware
@@ -87,4 +109,21 @@ func runMiddleware(r *appRouter, handler http.HandlerFunc) http.HandlerFunc {
 		handler = r.middleware[i](handler)
 	}
 	return handler
+}
+
+// getModifiedPath modifies the path to ensure it starts with a slash
+// and if a prefix is provided, it appends the prefix to the path.
+// It also ensures that the prefix ends with a slash.
+func getModifiedPath(prefix, path string) string {
+	// If the path does not start with a slash, add it.
+	if len(path) > 0 && path[0] != '/' {
+		path = "/" + path
+	}
+	if len(prefix) > 0 && prefix[len(prefix)-1] != '/' {
+		prefix += "/"
+	}
+	if len(path) > 0 && path[0] == '/' {
+		path = path[1:]
+	}
+	return prefix + path
 }
