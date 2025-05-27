@@ -111,19 +111,17 @@ func runMiddleware(r *appRouter, handler http.HandlerFunc) http.HandlerFunc {
 	return handler
 }
 
-// getModifiedPath modifies the path to ensure it starts with a slash
-// and if a prefix is provided, it appends the prefix to the path.
-// It also ensures that the prefix ends with a slash.
+// getModifiedPath modifies the path such that it includes the prefix
+// if one is set.
+// If the prefix is empty, it returns the path as is.
+// If the prefix does not end with a '/', it appends one,
+// and then concatenates it with the path.
 func getModifiedPath(prefix, path string) string {
-	// If the path does not start with a slash, add it.
-	if len(path) > 0 && path[0] != '/' {
-		path = "/" + path
+	if prefix == "" {
+		return path
 	}
-	if len(prefix) > 0 && prefix[len(prefix)-1] != '/' {
+	if prefix[len(prefix)-1] != '/' {
 		prefix += "/"
-	}
-	if len(path) > 0 && path[0] == '/' {
-		path = path[1:]
 	}
 	return prefix + path
 }
