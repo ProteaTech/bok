@@ -28,6 +28,9 @@ func (w *statusResponseWriter) Write(b []byte) (int, error) {
 }
 
 // Logger logs the request *and* the response status code.
+// Deprecated: middleware.Logger is deprecated and will be removed in a future
+// version.
+// Use router.SetLogger instead.
 func Logger(logger *slog.Logger) bok.Middleware {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(origW http.ResponseWriter, r *http.Request) {
