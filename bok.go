@@ -133,7 +133,6 @@ func (r *appRouter) WithMiddleware(mw ...Middleware) Router {
 func (r *appRouter) handle(method, path string, handler http.HandlerFunc) {
 	full := joinPath(method, r.prefix, path)
 
-	fmt.Printf("Registering %s %s\n", method, full)
 	// apply middleware in reverse so first in slice is outermost
 	h := applyMiddleware(r.middleware, handler)
 
