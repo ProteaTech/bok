@@ -1,6 +1,7 @@
 package bok
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 	"slices"
@@ -131,6 +132,8 @@ func (r *appRouter) WithMiddleware(mw ...Middleware) Router {
 // helper to register a method-guarded route
 func (r *appRouter) handle(method, path string, handler http.HandlerFunc) {
 	full := joinPath(method, r.prefix, path)
+
+	fmt.Printf("Registering %s %s\n", method, full)
 	// apply middleware in reverse so first in slice is outermost
 	h := applyMiddleware(r.middleware, handler)
 
@@ -191,7 +194,7 @@ func joinPath(method, prefix, route string) string {
 	}
 
 	// combine the method, prefix, and route
-	return method + prefix + route
+	return fmt.Sprintf("%s %s%s", method, prefix, route)
 }
 
 // applyMiddleware chains all given middleware around the handler.
