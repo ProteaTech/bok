@@ -130,7 +130,7 @@ func (r *appRouter) WithMiddleware(mw ...Middleware) Router {
 
 // helper to register a method-guarded route
 func (r *appRouter) handle(method, path string, handler http.HandlerFunc) {
-	full := joinPath(r.prefix, path)
+	full := joinPath(method, r.prefix, path)
 	// apply middleware in reverse so first in slice is outermost
 	h := applyMiddleware(r.middleware, handler)
 
@@ -165,12 +165,33 @@ func (r *appRouter) HEAD(path string, handler http.HandlerFunc) {
 	r.handle(http.MethodHead, path, handler)
 }
 
-// joinPath safely concatenates prefix + route, ensuring single slashes.
-func joinPath(prefix, route string) string {
-	if prefix == "" {
-		return route
+// joinPath safely concatenates Method + prefix + route, ensuring single slashes.
+func joinPath(method, prefix, route string) string {
+
+	if prefix != "" {
+		// ensure the prefix starts with a slash
+		if !strings.HasPrefix(prefix, "/") {
+			prefix = "/" + prefix
+		}
+
+		// ensure the prefix does not end with a slash
+		if strings.HasSuffix(prefix, "/") {
+			prefix = strings.TrimSuffix(prefix, "/")
+		}
 	}
-	return strings.TrimRight(prefix, "/") + "/" + strings.TrimLeft(route, "/")
+
+	// ensure leading slash on route
+	if !strings.HasPrefix(route, "/") {
+		route = "/" + route
+	}
+
+	// ensure no trailing slash on route
+	if strings.HasSuffix(route, "/") {
+		route = strings.TrimSuffix(route, "/")
+	}
+
+	// combine the method, prefix, and route
+	return method + prefix + route
 }
 
 // applyMiddleware chains all given middleware around the handler.
