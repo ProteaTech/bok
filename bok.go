@@ -26,6 +26,12 @@ func (w *statusResponseWriter) Write(b []byte) (int, error) {
 	return w.ResponseWriter.Write(b)
 }
 
+func (w *statusResponseWriter) Flush() {
+	if f, ok := w.ResponseWriter.(http.Flusher); ok {
+		f.Flush()
+	}
+}
+
 // Middleware wraps a http.HandlerFunc.
 type Middleware func(http.HandlerFunc) http.HandlerFunc
 
@@ -177,9 +183,7 @@ func joinPath(method, prefix, route string) string {
 		}
 
 		// ensure the prefix does not end with a slash
-		if strings.HasSuffix(prefix, "/") {
-			prefix = strings.TrimSuffix(prefix, "/")
-		}
+		prefix = strings.TrimSuffix(prefix, "/")
 	}
 
 	// ensure leading slash on route
@@ -188,9 +192,7 @@ func joinPath(method, prefix, route string) string {
 	}
 
 	// ensure no trailing slash on route
-	if strings.HasSuffix(route, "/") {
-		route = strings.TrimSuffix(route, "/")
-	}
+	route = strings.TrimSuffix(route, "/")
 
 	// combine the method, prefix, and route
 	return fmt.Sprintf("%s %s%s", method, prefix, route)
