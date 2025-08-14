@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"slices"
 	"strings"
+	"time"
 )
 
 // statusResponseWriter is the same as before…
@@ -69,9 +70,12 @@ func NewRouter() *appRouter {
 
 // ServeHTTP satisfies http.Handler.
 func (r *appRouter) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	startTime := time.Now()
 	sw := &statusResponseWriter{ResponseWriter: w}
 
 	r.mux.ServeHTTP(sw, req)
+
+	duration := time.Since(startTime)
 
 	if r.logger != nil {
 
@@ -86,6 +90,7 @@ func (r *appRouter) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 				"remote", req.RemoteAddr,
 				"status", sw.statusCode,
 				"user_agent", req.UserAgent(),
+				"duration", duration.Seconds(),
 			)
 		} else {
 
@@ -97,6 +102,7 @@ func (r *appRouter) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 				"remote", req.RemoteAddr,
 				"status", sw.statusCode,
 				"user_agent", req.UserAgent(),
+				"duration", duration.Seconds(),
 			)
 		}
 	}
